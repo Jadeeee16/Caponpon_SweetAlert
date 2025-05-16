@@ -1,5 +1,4 @@
 <?php
-
 class database {
     function opencon(): PDO { 
         return new PDO( 
@@ -14,11 +13,11 @@ class database {
         try {
             $con->beginTransaction();
 
-
+            // Insert into User Table
             $stmt = $con->prepare("INSERT INTO Admin    (admin_FN, admin_LN, admin_username,   admin_password) VALUES (?, ?, ?, ?)");
             $stmt->execute([$firstname, $lastname,  $username, $password]);
 
-
+            // Get the newly inserted user_id
             $userId = $con->lastInsertId();
             $con->commit();
             return $userId;
@@ -26,9 +25,12 @@ class database {
             $con->rollBack();
             return false;
         }
-
-
-
+    } public function isUsernameExists($username) {
+        $con = $this->opencon();
+        $stmt = $con->prepare("SELECT COUNT(*) FROM Admin WHERE admin_username = ?");
+        $stmt->execute([$username]);
+        $count = $stmt->fetchColumn();
+        return $count > 0;      
     }
 }
 ?>
