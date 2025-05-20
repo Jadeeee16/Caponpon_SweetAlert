@@ -32,7 +32,7 @@ class database {
         $count = $stmt->fetchColumn();
         return $count > 0;      
     } 
-    public function isEmailExists($email) {
+    public function isEmailExists($email) {}
         $con = $this->opencon();
         $stmt = $con->prepare("SELECT COUNT(*) FROM Admin WHERE admin_email = ?");
         $stmt->execute([$email]);
