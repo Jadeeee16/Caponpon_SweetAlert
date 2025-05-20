@@ -8,14 +8,14 @@ class database {
         password: '');
     }
 
-    function signupUser($firstname, $lastname, $username, $password) {
+    function signupUser($firstname, $lastname, $username, $email, $password) {
         $con = $this->opencon();
         try {
             $con->beginTransaction();
 
             // Insert into User Table
-            $stmt = $con->prepare("INSERT INTO Admin    (admin_FN, admin_LN, admin_username,   admin_password) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$firstname, $lastname,  $username, $password]);
+            $stmt = $con->prepare("INSERT INTO Admin    (admin_FN, admin_LN, admin_username, admin_email, admin_password) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$firstname, $lastname, $username, $email, $password]);
 
             // Get the newly inserted user_id
             $userId = $con->lastInsertId();
@@ -31,6 +31,31 @@ class database {
         $stmt->execute([$username]);
         $count = $stmt->fetchColumn();
         return $count > 0;      
+    } 
+    public function isEmailExists($email) {
+        $con = $this->opencon();
+        $stmt = $con->prepare("SELECT COUNT(*) FROM Admin WHERE admin_email = ?");
+        $stmt->execute([$email]);
+        $count = $stmt->fetchColumn();
+        return $count > 0;      
+    }
+
+    function loginUser($username, $password) {
+        $con = $this->opencon();
+        // Insert into User Table
+        $stmt = $con->prepare("SELECT * FROM Admin WHERE admin_username = ?");
+        $stmt->execute([$username]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['admin_password'])) {
+        return $user;
+        } else {
+            return false;
+        }
+
+        
+        
     }
 }
 ?>
